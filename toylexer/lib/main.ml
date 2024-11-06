@@ -25,22 +25,21 @@ let string_of_frequencies fl =
 
 (* frequency : int -> 'a list -> ('a * int) list *)
 let rec max n counter = function
-    a::l -> if(n = counter) then [] else a :: max n (counter+1) l 
-  |[] -> []
+  | a::l -> if n = counter then [] else a :: max n (counter + 1) l 
+  | [] -> []
 ;;
 
-let sorting_reverse l= List.rev (List.sort (fun (a, b) (a', b') -> if(a > a') then 1 else 
-                                             if a = a' then 0 else -1) l)
+let sorting_reverse l = 
+  List.rev (List.sort (fun (a, _) (a', _) -> if a > a' then 1 else if a = a' then 0 else -1) l)
 ;;
 
 let rec unique = function 
-    a::l -> if(List.mem a l) then unique l  else a::unique l
+  | a::l -> if List.mem a l then unique l else a :: unique l
   | [] -> []
 ;;
 
 let frequency n l = 
   max n 0 (sorting_reverse (unique (List.map (fun first -> 
-      (List.fold_left (fun acc x -> if (x = first) then acc+1 else acc) 0 l, first)) l )))
+      (List.fold_left (fun acc x -> if x = first then acc + 1 else acc) 0 l, first)) l)))
+  |> List.map (fun (count, elem) -> (elem, count))
 ;;
-
-frequency 3 [ID("x"); ASSIGN; ID("y"); SEQ; ID("x"); ASSIGN; ID("x"); PLUS; CONST("1")];;
