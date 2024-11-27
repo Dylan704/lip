@@ -26,7 +26,10 @@ let rec trace e = try
   with NoRuleApplies -> [e]
 
 
+type exprval = Bool of bool | Nat of int
+
 let rec eval = function
     True -> true
   | False -> false
+  | Zero -> 0
   | If(e0,e1,e2) -> if eval e0 then eval e1 else eval e2 

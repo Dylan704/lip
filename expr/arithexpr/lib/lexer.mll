@@ -9,17 +9,16 @@ rule read =
   | white { read lexbuf }  
   | "true" { TRUE }
   | "false" { FALSE }
+  | "0" { ZERO }
   | "(" { LPAREN }
   | ")" { RPAREN }
   | "if" { IF }
   | "then" { THEN }
   | "else" { ELSE }
-
-  | "not" { NOT }
   | "and" { AND }
   | "or" { OR }
-  | "zero" { ZERO }
+  | "not" { NOT}
   | "succ" { SUCC }
   | "pred" { PRED }
-  | "iszero" { ISZERO }
+  | "iszero" { ISZERO}
   | eof { EOF }

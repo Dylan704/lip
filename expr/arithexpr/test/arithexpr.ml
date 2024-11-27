@@ -51,15 +51,8 @@ let rec int_of_nat = function
   | Succ n -> 1 + int_of_nat n
   | _ -> failwith "int_of_nat on non-nat"
 
-(* reduce expression with small-step semantics and convert into value option *)
-let weval_smallstep e = match last (trace e) with
-    True -> Some (Bool true)
-  | False -> Some (Bool false)
-  | e when is_nv e -> Some (Nat (int_of_nat e))
-  | _ -> None
-
 let test_smallstep expr exp_result =
-  (expr |> parse |> weval_smallstep) = exp_result
+  (expr |> parse |> weval) = exp_result
 
 let%test "test_smallstep1" = test_smallstep "if true then true else false and false" (Some (Bool true))
 
@@ -82,4 +75,3 @@ let%test "test_smallstep9" = test_smallstep "not 0" None
 let%test "test_smallstep10" = test_smallstep "pred 0" None
 
 let%test "test_smallstep11" = test_smallstep "pred pred succ 0" None
-
