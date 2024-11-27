@@ -14,7 +14,7 @@ let rec string_of_expr = function
   | Pred(e0) -> "Pred(" ^ (string_of_expr e0) ^ ")"
   | IsZero(e0) -> "IsZero(" ^ (string_of_expr e0) ^ ")"
 
-  let string_of_val = function
+let string_of_val = function
   | Bool a -> string_of_bool a
   | Nat a -> string_of_int a
 
@@ -27,47 +27,48 @@ let parse (s : string) : expr =
 exception NoRuleApplies
 
 let rec trace1 = function
-  (* Casi di If *)
-  | If (True, e1, _) -> trace1 e1
-  | If (False, _, e2) -> trace1 e2
-  | If (e1, e2, e3) -> If (trace1 e1, e2, e3)
+  | If(True, e1, _) -> e1                     (* [S-IfTrue] *)
+  | If(False, _, e2) -> e2                    (* [S-IfFalse] *)
+  | If(e0, e1, e2) ->                         (* [S-If] *)
+      let e0' = trace1 e0 in
+      If(e0', e1, e2)
 
-  (* Casi di And *)
-  | And (True, e2) -> trace1 e2
-  | And (e1, True) -> trace1 e1
-  | And (False, _) -> False
-  | And (_, False) -> False
-  | And (e1, e2) -> trace1 (And (trace1 e1, trace1 e2))
+  | Not(True) -> False                        (* [S-NotTrue] *)
+  | Not(False) -> True                        (* [S-NotFalse] *)
+  | Not(e) ->                                 (* [S-Not] *)
+      let e' = trace1 e in
+      Not(e')
 
-  (* Casi di Or *)
-  | Or (True, _) -> True
-  | Or (_, True) -> True
-  | Or (False, e2) -> trace1 e2
-  | Or (e1, False) -> trace1 e1
-  | Or (e1, e2) -> trace1 (Or (trace1 e1, trace1 e2))
+  | And(True, e2) -> e2   
+  | And(e2,True ) -> e2                      (* [S-AndTrue] *)
+  | And(False, _) -> False    
+  | And(_,False ) -> False                (* [S-AndFalse] *)
+  | And(e1, e2) ->                           (* [S-And] *)
+    let e1' = trace1 e1 in
+    And(e1', e2)
 
-  (* Casi di Not *)
-  | Not True -> False
-  | Not False -> True
-  | Not e1 -> trace1 (Not (trace1 e1))
+  | Or(True, _) -> True                       (* [S-OrTrue] *)
+  | Or(False, e2) -> e2                       (* [S-OrFalse] *)
+  | Or(e1, e2) ->                             (* [S-Or] *)
+      let e1' = trace1 e1 in
+      Or(e1', e2)
 
-  (* Casi di Succ *)
-  | Succ Zero -> Succ Zero
-  | Succ e1 -> trace1 (Succ (trace1 e1))
+  | Succ(e) ->                                (* [S-Succ] *)
+      let e' = trace1 e in
+      Succ(e')                       (* [S-PredZero] *)
 
-  (* Casi di Pred *)
-  | Pred Zero -> Zero
-  | Pred (Succ e1) -> e1
-  | Pred e1 -> trace1 (Pred (trace1 e1))
+  | Pred(Succ(e)) -> e                        (* [S-PredSucc] *)
+  | Pred(e) ->                                (* [S-Pred] *)
+      let e' = trace1 e in
+      Pred(e')
 
-  (* Casi di IsZero *)
-  | IsZero Zero -> True
-  | IsZero (Succ _) -> False
-  | IsZero e1 -> trace1 (IsZero (trace1 e1))
+  | IsZero(Zero) -> True                      (* [S-IsZeroZero] *)
+  | IsZero(Succ(_)) -> False                  (* [S-IsZeroSucc] *)
+  | IsZero(e) ->                              (* [S-IsZero] *)
+      let e' = trace1 e in
+      IsZero(e')
 
-  (* Se non c'è una regola applicabile, solleva l'eccezione *)
-  | _ -> raise NoRuleApplies
-
+  | _ -> raise NoRuleApplies                  (* Nessuna regola applicabile *)
 
 let rec trace e = try
     let e' = trace1 e

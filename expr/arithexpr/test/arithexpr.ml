@@ -51,8 +51,21 @@ let rec int_of_nat = function
   | Succ n -> 1 + int_of_nat n
   | _ -> failwith "int_of_nat on non-nat"
 
+let weval_smallstep e =
+    let final_expr = last (trace e) in
+    (* Stampa l'espressione finale *)
+    Printf.printf "Final expression: %s\n" (string_of_expr final_expr);
+    match final_expr with
+    | True -> Some (Bool true)
+    | False -> Some (Bool false)
+    | e when is_nv e -> Some (Nat (int_of_nat e))
+    | _ -> None
+  
+      
 let test_smallstep expr exp_result =
-  (expr |> parse |> weval) = exp_result
+  (expr |> parse |> weval_smallstep) = exp_result
+
+let%test "test_smallstep5" = test_smallstep "iszero pred succ 0" (Some (Bool true))
 
 let%test "test_smallstep1" = test_smallstep "if true then true else false and false" (Some (Bool true))
 
@@ -61,8 +74,6 @@ let%test "test_smallstep2" = test_smallstep "if true then false else false or tr
 let%test "test_smallstep3" = test_smallstep "succ 0" (Some (Nat 1))
 
 let%test "test_smallstep4" = test_smallstep "succ succ succ pred pred succ succ pred succ pred succ 0" (Some (Nat 3))
-
-let%test "test_smallstep5" = test_smallstep "iszero pred succ 0" (Some (Bool true))
 
 let%test "test_smallstep6" = test_smallstep "iszero pred succ 0 and not iszero succ pred succ 0" (Some (Bool true))
 

@@ -21,8 +21,8 @@ open Ast
 %start <expr> prog
 
 %left AND OR
-%right SUCC PRED ISZERO
-%right NOT     
+%right SUCC PRED ISZERO 
+%right NOT
 
 %%
 
