@@ -3,6 +3,7 @@ open Ast
 type exprval = Bool of bool | Nat of int
 (*SARITHEXPR NEW TYPE*)
 type exprtype = BoolT | NatT
+exception TypeError of string
 
 let rec string_of_expr = function
     True -> "True"
@@ -15,6 +16,10 @@ let rec string_of_expr = function
   | Succ(e0) -> "Succ(" ^ (string_of_expr e0) ^ ")"
   | Pred(e0) -> "Pred(" ^ (string_of_expr e0) ^ ")"
   | IsZero(e0) -> "IsZero(" ^ (string_of_expr e0) ^ ")"
+
+let string_of_type = function
+    BoolT -> "BoolT"
+  | NatT -> "NatT"
 
 let string_of_val = function
   | Bool a -> string_of_bool a
@@ -115,5 +120,50 @@ let rec eval = function
 | IsZero e0 -> (
     match eval e0 with
     | Nat n -> Bool (n = 0)
+    | _ -> failwith "Argument of IsZero must be a natural number"
+  )
+
+
+let rec typecheck = function 
+| True -> BoolT
+| False -> BoolT
+| Zero -> NatT
+| If(e0, e1, e2) -> (
+    if(typecheck e1 = typecheck e2)
+      then  match eval e0 with
+    | Bool true -> typecheck e1
+    | Bool false -> typecheck e2
+    | _ -> failwith "Condition of If must be a boolean"
+      else
+        failwith "Condition of If must be a boolean"
+  )
+| Not e0 -> (
+    match eval e0 with
+    | Bool _ -> BoolT
+    | _ -> failwith "Argument of Not must be a boolean"
+  )
+| And (e0, e1) -> (
+    match (eval e0, eval e1) with
+    | (Bool _, Bool _) -> BoolT
+    | _ -> failwith "Arguments of And must be booleans"
+  )
+| Or (e0, e1) -> (
+    match (eval e0, eval e1) with
+    | (Bool _, Bool _) -> BoolT
+    | _ -> failwith "Arguments of Or must be booleans"
+  )
+| Succ e0 -> (
+    match eval e0 with
+    | Nat _ -> NatT
+    | _ -> failwith "Argument of Succ must be a natural number"
+  )
+| Pred e0 -> (
+    match eval e0 with
+    | Nat n when n > 0 -> NatT
+    | _ -> failwith "Argument of Pred must be a natural number"
+  )
+| IsZero e0 -> (
+    match eval e0 with
+    | Nat _ -> BoolT
     | _ -> failwith "Argument of IsZero must be a natural number"
   )

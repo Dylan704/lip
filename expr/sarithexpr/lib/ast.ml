@@ -9,3 +9,17 @@ type expr =
   | Succ of expr
   | Pred of expr
   | IsZero of expr
+
+  let rec isvalue : expr -> bool = function
+  | True -> true
+  | False -> true
+  | Zero -> true
+  | Succ e when isvalue e -> true
+  | Pred e when isvalue e -> true
+  | _ -> false
+
+
+let rec is_nv : expr -> bool = function
+  | Zero -> true
+  | Succ(e) -> is_nv e
+  | _ -> false
