@@ -2,58 +2,50 @@
 open Ast
 %}
 
-%token TRUE
-%token FALSE
-%token NOT
-%token AND
-%token OR
-%token ADD
-%token SUB
-%token MUL
-%token EQ
-%token LEQ
-
-%token LPAREN
-%token RPAREN
-
-%token SKIP
+%token TRUE FALSE
+%token <string> VAR
+%token <int> CONST
+%token NOT AND OR
+%token ADD SUB MUL
+%token EQ LEQ
 %token ASSIGN
 %token SEQ
-%token IF
-%token WHILE
+%token IF THEN ELSE
+%token WHILE DO
+%token LPAREN RPAREN
+%token EOF
 
-%start <expr> prog
-
-%left AND OR ADD SUB MUL EQ LEQ SEQ
-%right ASSIGN WHILE DO
 %right NOT
+%left AND OR
+%left ADD SUB 
+%left MUL
+%left EQ LEQ
+
+%start <cmd> prog
 
 %%
 
 prog:
-  | e = expr EOF { e }
-  | c = cmd EOF { c } 
+  | c = cmd; EOF { c }
 ;
 
 expr:
   | TRUE { True }
   | FALSE { False }
-  | LPAREN e = expr RPAREN { e }
-  | NOT e = expr { Not e }
-  | e1 = expr AND e2 = expr { And (e1, e2) }
-  | e1 = expr OR e2 = expr { Or (e1, e2) }
-  | e1 = expr ADD e2 = expr { Add(e1, e2) }
-  | e1 = expr SUB e2 = expr { Sub(e1, e2) }
-  | e1 = expr MUL e2 = expr { Mul(e1, e2) }
-  | e1 = expr EQ e2 = expr { Eq(e1, e2) }
-  | e1 = expr LEQ e2 = expr { Leq(e1, e2) }
-;
-
+  | VAR { Var($1) }
+  | CONST { Const($1) }
+  | NOT; e = expr; { Not(e) }
+  | e1 = expr; AND; e2 = expr; { And(e1, e2) }
+  | e1 = expr; OR; e2 = expr; { Or(e1, e2) }
+  | e1 = expr; ADD; e2 = expr; { Add(e1, e2) }
+  | e1 = expr; SUB; e2 = expr; { Sub(e1, e2) }
+  | e1 = expr; MUL; e2 = expr; { Mul(e1, e2) }
+  | e1 = expr; EQ; e2 = expr; { Eq(e1, e2) }
+  | e1 = expr; LEQ; e2 = expr; { Leq(e1, e2) }
+  | LPAREN; e = expr; RPAREN { e }
 
 cmd:
-  | SKIP { Skip}
-  | e1 = Var ASSIGN e2 = Const { Assign(e1, e2) }
-  | e1 = cmd SEQ e2 = cmd { Seq(e1, e2) }
-  | IF e1 = expr THEN e2 = cmd ELSE e3 = cmd { If (e1, e2, e3) }
-  | WHILE e1 = expr DO e2 = cmd { While(e1, e2) }
-;
+  | VAR; ASSIGN; e = expr; { Assign($1, e) }
+  | c1 = cmd; SEQ; c2 = cmd; { Seq(c1, c2) }
+  | IF; e = expr; THEN; c1 = cmd; ELSE; c2 = cmd; { If(e, c1, c2) }
+  | WHILE; e = expr; DO; c = cmd; {While(e, c)}
