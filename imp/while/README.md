@@ -47,7 +47,7 @@ while not a=b do (
 );
 gcd:=a
 ```
-              
+
 ## Operational semantics
 
 Define the semantics of expressions in a big-step style:
