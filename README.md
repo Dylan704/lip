@@ -4,12 +4,16 @@ LiP students are expected to fork the repository and push solutions to the exerc
 
 Invitation to the Discord server: **[https://discord.gg/JKPWbpXBf4](https://discord.gg/JKPWbpXBf4)**
 
+## ⚠️⚙️ 2024 Project
+
+Examples and (very soon) unit tests for this year's project **Tiny Rust** are available in the [lip24](lip24/) directory.
+
 ## Course outline
 
 ### Warm-up exercises
 
 1. [Adder](basics/adder)
-1. [Tug of war](basics/tugofwar) (optional) 
+1. [Tug of war](basics/tugofwar) (optional)
 
 ### Lexing and parsing
 
@@ -37,3 +41,5 @@ Invitation to the Discord server: **[https://discord.gg/JKPWbpXBf4](https://disc
 - [OCaml Programming: Correct + Efficient + Beautiful](https://cs3110.github.io/textbook/cover.html)
 - [OCaml from the very beginning](http://ocaml-book.com/)
 - B. Pierce. Types and Programming Languages. MIT Press, 2002
+- [Menhir manual](https://cambium.inria.fr/~fpottier/menhir/manual.html) and
+  [demos](https://gitlab.inria.fr/fpottier/menhir/-/tree/master/demos?ref_type=heads)
