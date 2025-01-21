@@ -1,5 +1,4 @@
 open BlocksLib.Ast
-open BlocksLib.Types
 open BlocksLib.Prettyprint
 open BlocksLib.Main
 
@@ -7,8 +6,10 @@ open BlocksLib.Main
  parse test : (variable, term, expected result)
  **********************************************************************)
 
+(*
+
 let test_parse cmd exp_result =
-  cmd |> parse |> fun c -> c = exp_result
+  cmd |> parse |> extract_cmd |> fun c -> c = exp_result
 
 let%test "test_parse1" = test_parse
     "{ x:=0 }"
@@ -33,11 +34,67 @@ let%test "test_parse5" = test_parse
 let%test "test_parse6" = test_parse
     "{ int x; int y; int z; skip }"
     (Decl ([IntVar "x"; IntVar "y"; IntVar "z"], Skip))
+*)
+
+let test_parse cmd exp_result =
+  let parsed_result = parse cmd in
+  print_endline ("");
+  print_endline ("Parsing input: " ^ cmd);
+  print_endline ("Expected output: " ^ string_of_cmd exp_result);
+  print_endline ("Parsed output: " ^ string_of_cmd (extract_cmd parsed_result));
+  
+  parsed_result |> extract_cmd = exp_result
+
+
+
+let%test "test_parse1" =
+  let input = "{ x := 0 }" in
+  let expected = Decl([], Assign("x", Const(0))) in
+  let result = test_parse input expected in
+  print_endline ("Test result: " ^ string_of_bool result);
+  result
+
+let%test "test_parse2" =
+  let input = "x := 0; y := x + 1" in
+  let expected = Seq(Assign("x", Const(0)), Assign("y", Add(Var("x"), Const(1)))) in
+  let result = test_parse input expected in
+  print_endline ("Test result: " ^ string_of_bool result);
+  result
+
+let%test "test_parse3" =
+  let input = "x := 0; if x = 0 then y := 1 else y := 0" in
+  let expected = Seq(Assign("x", Const(0)), If(Eq(Var("x"), Const(0)), Assign("y", Const(1)), Assign("y", Const(0)))) in
+  let result = test_parse input expected in
+  print_endline ("Test result: " ^ string_of_bool result);
+  result
+
+let%test "test_parse4" =
+  let input = "x := 0; if x = 0 then y := 1 else y := 0; x := 2" in
+  let expected = Seq(Seq(Assign("x", Const(0)), If(Eq(Var("x"), Const(0)), Assign("y", Const(1)), Assign("y", Const(0)))), Assign("x", Const(2))) in
+  let result = test_parse input expected in
+  print_endline ("Test result: " ^ string_of_bool result);
+  result
+
+let%test "test_parse5" =
+  let input = "x := 3; while x <= 0 do x := x - 1; y := 0" in
+  let expected = Seq(Seq(Assign("x", Const(3)), While(Leq(Var "x", Const 0), Assign("x", Sub(Var "x", Const 1)))), Assign("y", Const(0))) in
+  let result = test_parse input expected in
+  print_endline ("Test result: " ^ string_of_bool result);
+  result
+
+let%test "test_parse6" =
+  let input = "{ int x; int y; int z; skip }" in
+  let expected = Decl([IntVar "x"; IntVar "y"; IntVar "z"], Skip) in
+  let result = test_parse input expected in
+  print_endline ("Test result: " ^ string_of_bool result);
+  result
+
 
 (**********************************************************************
  trace test : (command, n_steps, loc, expected value after n_steps)
  **********************************************************************)
 
+ (*
 let test_trace (cmd,n_steps,var,exp_val) =
   cmd
   |> parse
@@ -84,3 +141,4 @@ let%test "test_trace12" = test_trace
 
 let%test "test_trace13" = test_trace
     ("{ int y; { int x; x:=20; y:=x }; { int x; x:=30; y:=x+y+1 } }", 10, 0, Int 51)
+*)

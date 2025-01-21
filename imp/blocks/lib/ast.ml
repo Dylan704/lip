@@ -24,5 +24,5 @@ type cmd =
   | Seq of cmd * cmd
   | If of expr * cmd * cmd
   | While of expr * cmd
-  | Decl of decl list * cmd
-  | Block of cmd (* Runtime only! *)
+  | Decl of decl list * cmd  (* qui Decl è un costruttore per cmd *)
+  | Block of cmd
