@@ -2,13 +2,11 @@ let pr = Printf.printf
 
 let spr = Printf.sprintf
 
-(**
-  Replace the string below with the absolute path of the examples
-  directory in your file system.
+(** Replace the string below with the absolute path of the examples directory in
+    your file system.
 
-  To get this path, [cd] into the examples directory and run [pwd].
-*)
-let examples_dir = "/absolute/path/to/tinyrust/examples/"
+    To get this path, [cd] into the examples directory and run [pwd]. *)
+let examples_dir = "/workspaces/lip/lip24/test/examples/"
 
 let examples =
   let full_name name = examples_dir ^ name in

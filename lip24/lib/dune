@@ -1,0 +1,8 @@
+(library
+ (name tinyrust)
+ (libraries str))
+
+(menhir
+ (modules parser))
+
+(ocamllex lexer)
